@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .scene {
+            width: 500px;
+            height: 500px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -250px;
+            margin-top: -250px;
+        }
+
+        .box {
+            width: 200px;
+            height: 200px;
+            margin: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 1s;
+        }
+
+        .face {
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .face:nth-child(1) {
+            background-color: pink;
+            transform: translateZ(100px);
+        }
+
+        .face:nth-child(2) {
+            background-color: rgb(31, 117, 197);
+            transform: translateY(100px) rotateX(90deg);
+        }
+
+        .face:nth-child(3) {
+            background-color: yellowgreen;
+            transform: translateY(-100px) rotateX(90deg);
+        }
+
+        .face:nth-child(4) {
+            background-color: rosybrown;
+            transform: translateZ(-100px);
+        }
+
+        .left {
+            width: 50px;
+            height: 50px;
+            float: left;
+            position: relative;
+            left: 50px;
+            top: 220px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .left:hover {
+            color: skyblue;
+        }
+
+        span {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .left span {
+            line-height: 50px;
+            text-align: center;
+            font-size: 50px;
+        }
+
+        .right {
+            width: 50px;
+            height: 50px;
+            float: left;
+            position: relative;
+            left: 410px;
+            bottom: 280px;
+            cursor: pointer;
+        }
+
+        .right:hover {
+            color: skyblue;
+        }
+
+        .right span {
+            line-height: 50px;
+            text-align: center;
+            font-size: 50px;
+        }
+
+        .btns {
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            margin-left: 170px;
+            position: relative;
+            bottom: 100px;
+            z-index: 1;
+        }
+
+        .btns div {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 10px;
+            float: left;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="scene">
+            <div class="left">
+                <span><</span>
+            </div>
+            <div class="box">
+                <div class="face"></div>
+                <div class="face"></div>
+                <div class="face"></div>
+                <div class="face"></div>
+            </div>
+            <div class="right">
+                <span>></span>
+            </div>
+            <div class="btns">
+                <div style="background: #999;" class="btn">1</div>
+                <div class="btn" style="background: #eee;">2</div>
+                <div class="btn" style="background: #eee;">3</div>
+                <div class="btn" style="background: #eee;">4</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="animate.js"></script>
+    <script>
+        var scene = document.querySelector(".scene");
+        var box = document.querySelector(".box");
+        var left = document.querySelector(".left");
+        var right = document.querySelector(".right");
+        var btns = document.querySelectorAll(".btn");
+        console.log(btns);
+
+        var angle = 90;
+        var num = 0;
+        //自动轮播
+        function run() {
+            num++;
+            box.style.transform = "rotateX(" + num * angle + "deg)"
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.background = "#eee"
+            }
+            btns[num % 4].style.background = "#999"
+        }
+        var t = setInterval(run, 3000);
+        //浏览器失去焦点
+        window.onblur = function () {
+            clearInterval(t);
+        }
+        //浏览器获得焦点
+        window.onfocus = function (){
+            t = setInterval(run, 3000);
+        }
+        //右键点击事件
+        right.onclick = function () {
+            num++;
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.background = "#eee"
+            }
+            if (num < 0) {
+                var current = -num;
+            } else {
+                var current = num;
+            }
+            box.style.transform = "rotateX(" + num * angle + "deg)";
+            btns[current % 4].style.background = "#999"
+        }
+        //左键点击事件
+        left.onclick = function () {
+            num--;
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.background = "#eee"
+            }
+            if (num < 0) {
+                var current = -num;
+            } else {
+                var current = num;
+            }
+            box.style.transform = "rotateX(" + num * angle + "deg)";
+            btns[current % 4].style.background = "#999"
+        }
+        //适配页面和按钮
+        for (let i = 0; i < btns.length; i++) {
+            btns[i].onclick = function () {
+                num -= (Math.abs(num) % 4 - i);
+                box.style.transform = "rotateX(" + num * angle + "deg)";
+                for (var j = 0; j < btns.length; j++) {
+                    btns[j].style.background = "#eee"
+                }
+                this.style.background = "#999"
+            }
+        }
+        //鼠标移入
+        scene.onmouseover = function () {
+            clearInterval(t);
+        }
+        //鼠标移出
+        scene.onmouseout = function () {
+            t = setInterval(run, 3000);
+        }
+        mousedir(box,function(val){
+            //向下拖拽
+            box.style.transition = "none";
+            box.style.transform = "rotateX(" + ((num*angle)+val) + "deg)";
+        },function(val){
+            //向上拖拽
+            box.style.transition = "none";
+            box.style.transform = "rotateX(" + ((num*angle)-val) + "deg)";
+        },function(val){
+            //向下拖拽结束
+            box.style.transition = "all 1s";
+            if(val>50){
+                num++;
+            }
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.background = "#eee"
+            }
+            if (num < 0) {
+                var current = -num;
+            } else {
+                var current = num;
+            }
+            box.style.transform = "rotateX(" + num * angle + "deg)";
+            btns[current % 4].style.background = "#999"
+        },function(val){
+            //向上拖拽结束
+            box.style.transition = "all 1s";
+            if(val>50){
+                num--;
+            }
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].style.background = "#eee"
+            }
+            if (num < 0) {
+                var current = -num;
+            } else {
+                var current = num;
+            }
+            box.style.transform = "rotateX(" + num * angle + "deg)";
+            btns[current % 4].style.background = "#999"
+        })
+        //拖拽换图
+        function mousedir(obj,down,up,down1,up1) {
+            obj.onmousedown = function (ev) {
+                var startX = ev.clientX;
+                var startY = ev.clientY;
+                var moveX, moveY;
+                document.onmousemove = function (ev) {
+                    moveX = ev.clientX;
+                    moveY = ev.clientY;
+                    if(moveY>startY){
+                        up(Math.abs(moveY-startY));
+                    }else{
+                        down(Math.abs(moveY-startY));
+                    }
+                    ev.preventDefault();
+                }
+
+                document.onmouseup = function () {
+                    if(moveY>startY){
+                        up1(Math.abs(moveY-startY));
+                    }else{
+                        down1(Math.abs(moveY-startY));
+                    }
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
